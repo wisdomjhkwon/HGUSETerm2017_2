@@ -166,7 +166,7 @@ class CommandInterpreter {
 		if (option == 0) {
 			option = 1;
 		}
-		for (int i = 0; i < md_files.length; i++) {
+		for (int i = 0; i < mdcount; i++) {
 			try {
 				FileInputStream input = new FileInputStream(md_files[i]);
 			} catch (FileNotFoundException e) {

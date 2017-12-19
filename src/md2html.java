@@ -9,6 +9,7 @@ public class md2html {
    private static String[] htmlFiles;
    private static int option;
    public static void main(String[] args) {
+	   System.out.println("hi");
       CommandInterpreter ci = new CommandInterpreter(args);
       inputStreams = ci.getInputStreams();
       htmlFiles = ci.getHTMLFiles();
@@ -31,6 +32,7 @@ class MDParser{
          try {
             while ((line = in.readLine()) != null) {
                System.out.println(lineAnalysis(line));
+               
             }
          } catch (IOException e) {
             // TODO Auto-generated catch block

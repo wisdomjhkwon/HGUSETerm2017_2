@@ -3,7 +3,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 public class md2html {
 	private static FileReader[] inputStreams;
@@ -22,47 +21,72 @@ public class md2html {
 }
 
 class MDParser{
-	public MDParser(FileReader[] inputs){
-		for(int i=0; i<inputs.length; i++){
-			BufferedReader in = new BufferedReader(inputs[i]);
-			String line;
-			String bufferedLine;
-			try {
-				while ((line = in.readLine()) != null) {
-					System.out.println(lineAnalysis(line));
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	public ArrayList<String> bufferedLine;
+   public MDParser(FileReader[] inputs){
+	   bufferedLine = new ArrayList<String>();
+	   
+      for(int i=0; i<inputs.length; i++){
+         BufferedReader in = new BufferedReader(inputs[i]);
+         String line;
+		 int curState;
+		 int prevState;
+		 
+         try {
+            while ((line = in.readLine()) != null) {
+            	curState = lineAnalysis(line);
+			   
+
+
+				prevState = curState;
+            }
+         } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+   }
+   
+   public int lineAnalysis(String line){
+      if(line.length() == 0){
+         return 0;
+      }
+      else if(line.charAt(0)==' ' && line.charAt(1)==' ' && line.charAt(2)==' ' && line.charAt(3)==' '){
+         if(line.charAt(4)==' ' && line.charAt(5)==' ' && line.charAt(6)==' ' && line.charAt(7)==' '){
+            return 7; // double indented
+         }
+         return 6; // indented
+      }
+      else{
+		String[] words = line.split("\\s");
+		int i=0;
+		 for(; i<words[0].length(); i++){
+			if(words[0].charAt(i) != '#'){
+			   break;
 			}
-		}
-	}
-	
-	public int lineAnalysis(String line){
-		if(line.length() == 0){
-			return 0; // blank
-		}
-		else if(line.charAt(0)==' ' && line.charAt(1)==' ' && line.charAt(2)==' ' && line.charAt(3)==' '){
-			if(line.charAt(4)==' ' && line.charAt(5)==' ' && line.charAt(6)==' ' && line.charAt(7)==' '){
-				return 7; // double indented
-			}
-			return 6; // indented
-		}
-		else{
-			String[] words = line.split("\\s");
-			int i=0;
-		    for(; i<words[0].length(); i++){
-		    	if(words[0].charAt(i) != '#'){
-		    		break;
-		    	}
-		    }
-		    if(i == words[0].length()){
-		    	return 2;
-		    }
-			
-			return 1;
-		}
-	}
+		 }
+		 if(i == words[0].length()){
+			return 2;
+		 }
+		 return 1;
+      }
+   }
+
+   public void toBuffer(ArrayList<String> theBuffer, String inputLine) {
+	   theBuffer.add(inputLine);
+   }
+   
+   public void clearBuffer(ArrayList<String> theBuffer) {
+	   theBuffer.clear();
+   }
+   
+   public ArrayList<String> getBuffer(ArrayList<String> theBuffer) {
+	   if(!theBuffer.isEmpty()) {
+		   for(int i = 0; i < theBuffer.size(); i++) {
+               System.out.println("one index " + i + " : value " + theBuffer.get(i));
+           }
+	   }
+	   return theBuffer;
+   }
 }
 
 interface MDElement{

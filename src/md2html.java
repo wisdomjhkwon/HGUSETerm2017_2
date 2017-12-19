@@ -1,10 +1,111 @@
-import java.io.FileInputStream;
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class md2html {
+	private static FileReader[] inputStreams;
+	private static String[] htmlFiles;
+	private static int option;
 	public static void main(String[] args) {
 		CommandInterpreter ci = new CommandInterpreter(args);
+		inputStreams = ci.getInputStreams();
+		htmlFiles = ci.getHTMLFiles();
+		option = ci.getOption();
+		MDParser mp = new MDParser(inputStreams);
 	}
+}
+
+class MDParser{
+	public MDParser(FileReader[] inputs){
+		for(int i=0; i<inputs.length; i++){
+			BufferedReader in = new BufferedReader(inputs[i]);
+			String line;
+			String bufferedLine;
+			try {
+				while ((line = in.readLine()) != null) {
+					Structure.create(line);
+					System.out.println(line);
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+}
+
+interface MDElement{
+//	public void accept();
+}
+
+class Document implements MDElement{
+	
+}
+
+class Structure implements MDElement{
+	private String parsedLine;
+	public Structure(String parsedLine){
+		this.parsedLine = parsedLine;
+	}
+	public static Structure create(String parsedLine){
+		return new Structure(parsedLine);
+	}
+}
+
+class Header extends Structure{
+
+	public Header(String parsedLine) {
+		super(parsedLine);
+		// TODO Auto-generated constructor stub
+	}
+	
+}
+class Block extends Structure{
+
+	public Block(String parsedLine) {
+		super(parsedLine);
+		// TODO Auto-generated constructor stub
+	}
+	
+}
+class QuotedBlock extends Structure{
+
+	public QuotedBlock(String parsedLine) {
+		super(parsedLine);
+		// TODO Auto-generated constructor stub
+	}
+	
+}
+class CodeBlock extends Structure{
+
+	public CodeBlock(String parsedLine) {
+		super(parsedLine);
+		// TODO Auto-generated constructor stub
+	}
+	
+}
+class ItemList extends Structure{
+
+	public ItemList(String parsedLine) {
+		super(parsedLine);
+		// TODO Auto-generated constructor stub
+	}
+	
+}
+
+class Text implements MDElement{
+	
+}
+
+class PlainText extends Text{
+	
+}
+class SytleText extends Text{
+	
+}
+class HTMLCode extends Text{
+	
 }
 
 class CommandInterpreter {
@@ -13,6 +114,7 @@ class CommandInterpreter {
 	private int option = 0; // 0: no option, 1: plain, 2: stylish, 3: slide
 	private int mdcount = 0;
 	private int htmlcount = 0;
+	private FileReader[] input;
 
 	public CommandInterpreter(String[] args) {
 		md_files = new String[args.length];
@@ -26,9 +128,10 @@ class CommandInterpreter {
 		c1 = args[0];
 		if (c1.indexOf('.') != -1) {
 			String sp[] = c1.split("\\.");
-			if (sp[1].equals("md")) {
+			if (sp[sp.length-1].equals("md")) {
 				addMdFile(c1);
 			} else {
+				System.out.println("???");
 				printIllegalMessage();
 			}
 		} else if (c1.equals("--plain")) {
@@ -166,9 +269,10 @@ class CommandInterpreter {
 		if (option == 0) {
 			option = 1;
 		}
+		input = new FileReader[mdcount];
 		for (int i = 0; i < mdcount; i++) {
 			try {
-				FileInputStream input = new FileInputStream(md_files[i]);
+				input[i] = new FileReader(md_files[i]);
 			} catch (FileNotFoundException e) {
 				printNoFile();
 			}
@@ -177,7 +281,6 @@ class CommandInterpreter {
 
 	public String getFormat(String file) {
 		if (file.lastIndexOf('.') == -1) {
-			// System.out.println("???");
 			printIllegalMessage();
 			return "";
 		} else {
@@ -211,5 +314,14 @@ class CommandInterpreter {
 		System.out.println();
 
 		System.exit(0);
+	}
+	public FileReader[] getInputStreams(){
+		return input;
+	}
+	public String[] getHTMLFiles(){
+		return html_files;
+	}
+	public int getOption() {
+		return option;
 	}
 }

@@ -33,7 +33,8 @@ class MDParser{
 		 
          try {
             while ((line = in.readLine()) != null) {
-            	curState = lineAnalysis(line);
+				curState = lineAnalysis(line);
+				System.out.println(line + " " + curState);
 			   
 
 
@@ -50,24 +51,67 @@ class MDParser{
       if(line.length() == 0){
          return 0;
       }
-      else if(line.charAt(0)==' ' && line.charAt(1)==' ' && line.charAt(2)==' ' && line.charAt(3)==' '){
-         if(line.charAt(4)==' ' && line.charAt(5)==' ' && line.charAt(6)==' ' && line.charAt(7)==' '){
-            return 7; // double indented
-         }
-         return 6; // indented
-      }
+    //   else if(line.charAt(0)==' ' && line.charAt(1)==' ' && line.charAt(2)==' ' && line.charAt(3)==' '){
+    //      if(line.charAt(4)==' ' && line.charAt(5)==' ' && line.charAt(6)==' ' && line.charAt(7)==' '){
+    //         return 7; // double indented
+    //      }
+    //      return 6; // indented
+    //   }
       else{
-		String[] words = line.split("\\s");
 		int i=0;
-		 for(; i<words[0].length(); i++){
-			if(words[0].charAt(i) != '#'){
-			   break;
+		String[] words = line.split("\\s");
+		// System.out.println(words.length);
+		if(words.length == 1){
+			int j=0;
+			for(i=0; i<words[0].length(); i++){
+				if(words[0].charAt(i) != '=' && words[0].charAt(i) != '-'){
+					break;
+				}
 			}
-		 }
-		 if(i == words[0].length()){
-			return 2;
-		 }
-		 return 1;
+			if(i == words[0].length()){
+				return 3;
+			}
+		}
+		else{
+			if(words.length >= 3){
+				if(words.length == 3){
+					if(words[0].charAt(0) == '[' && 
+							words[0].charAt(words[0].length()-2) == ']' && 
+							words[0].charAt(words[0].length()-1) == ':' &&
+							words[2].charAt(0) == '(' &&
+							words[2].charAt(words[2].length()-1) == ')'){
+						return 9;
+					}
+				}
+				for(i=0; i<words.length; i++){
+					if(!words[i].equals("-"))
+						break;
+				}
+				if(i == words.length){
+					return 8;
+				}
+			}
+			for(i=0; i<words[0].length(); i++){
+				if(words[0].charAt(i) != '#'){
+					break;
+				}
+			}
+			if(i == words[0].length() && i != 0){
+				// System.out.println(words[0]);
+				return 2;
+			}
+			if(words[0].length() !=0 && words[0].charAt(0) == '>'){
+				return 4;
+			}
+			int k=0;
+			while(words[k].length() == 0)
+				k++;
+			// System.out.println(words[k]);
+			if(words[k].equals("*") || words[k].equals("+") || words[k].equals("-")){
+				return 5;				
+			}
+		}
+		return 1;
       }
    }
 

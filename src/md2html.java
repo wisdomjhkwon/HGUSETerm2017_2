@@ -17,63 +17,177 @@ public class md2html {
 		}
 		option = ci.getOption();
 		MDParser mp = new MDParser(inputStreams);
+
+		// mp.mdFiles.get(0).structures.get(0).lines.size();
+
+		for(int i=0; i<mp.mdFiles.size(); i++){
+			System.out.println(mp.mdFiles.get(i).structures.size());
+			for(int j=0; j<mp.mdFiles.get(i).structures.size(); j++){
+				if(mp.mdFiles.get(i).structures.get(j) instanceof Block){
+					System.out.println("Block");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof Header){
+					System.out.println("Header");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof QuotedBlock){
+					System.out.println("QuotedBlock");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof ItemList){
+					System.out.println("ItemList");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof Horizontal ){
+					System.out.println("Horizontal");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof LinkReference){
+					System.out.println("LinkReference");
+				}
+				for(int k=0; k<mp.mdFiles.get(i).structures.get(j).lines.size(); k++){
+					System.out.println(mp.mdFiles.get(i).structures.get(j).lines.get(k));
+				}
+				System.out.println();
+			}
+		}
 	}
 }
 
 class MDParser{
 	public ArrayList<String> bufferedLine;
-	private ArrayList<Document> mdFiles;
+	public ArrayList<Document> mdFiles;
 	public MDParser(FileReader[] inputs){
 		bufferedLine = new ArrayList<String>();
 		mdFiles = new ArrayList<Document>();
 		int curState = -1;
 		int prevState = -1;
+		int flag = -1;
 	   
-	for(int i=0; i<inputs.length; i++){
-		BufferedReader in = new BufferedReader(inputs[i]);
-		String line;
-		 
-        try {  
-			while ((line = in.readLine()) != null) {
-				curState = lineAnalysis(line);
-				System.out.println(line);
-			    //this.toBuffer(bufferedLine, line);
-				
-				switch(curState) {
-					case 0: {
-
-					}
-					case 1: {
-						this.toBuffer(bufferedLine, line);
-					}
-					case 2: {
-						System.out.println("Header");
-						// create the text of header
-						
-					}
-					case 3:{
-						if(prevState==1) {
-							System.out.println("header");
-							this.getBuffer(bufferedLine);
+		for(int i=0; i<inputs.length; i++){
+			mdFiles.add(new Document());
+			BufferedReader in = new BufferedReader(inputs[i]);
+			String line;
+			
+			try {  
+				while ((line = in.readLine()) != null) {
+					curState = lineAnalysis(line);
+					
+					switch(curState) {
+						case 0: {
+							if(bufferedLine.size() != 0){
+								if(lineAnalysis(bufferedLine.get(0)) == 1){
+									mdFiles.get(i).structures.add(new Block(bufferedLine));
+								}
+								else if(lineAnalysis(bufferedLine.get(0)) == 4){
+									mdFiles.get(i).structures.add(new QuotedBlock(bufferedLine));
+								}
+								else if(lineAnalysis(bufferedLine.get(0)) == 5){
+									mdFiles.get(i).structures.add(new ItemList(bufferedLine));
+								}
+								else{
+									mdFiles.get(i).structures.add(new Block(bufferedLine));
+								}
+							}
 							this.clearBuffer(bufferedLine);
+							break;
 						}
-						else {
-							System.out.println("Horizontal line");
+						case 1: {
+							this.toBuffer(bufferedLine, line);
+							break;
+						}
+						case 2: {
+							this.toBuffer(bufferedLine, line);
+							mdFiles.get(i).structures.add(new Header(bufferedLine));
+							this.clearBuffer(bufferedLine);
+							// System.out.println("============CASE 2 HEADER =======");
+							//create the text of header
+							break;
+						}
+						case 3:{
+							if(prevState==1) {
+								// System.out.println("~~~~CASE 3 HEADER~~~~~s");
+								mdFiles.get(i).structures.add(new Header(bufferedLine));
+								this.clearBuffer(bufferedLine);
+							}
+							// else {
+							// 	flag = prevState;
+								
+							// 	if(!bufferedLine.isEmpty()) {
+							// 		this.getBuffer(bufferedLine);
+							// 	}
+								
+							// 	System.out.println("============CASE3 HorizontalLine =======");
+							// }
+							break;
+						}
+						case 4: { // > quoted block
+							if(prevState != 4) {
+								flag = prevState;
+								if(bufferedLine.size() != 0){
+									if(lineAnalysis(bufferedLine.get(0)) == 1){
+										mdFiles.get(i).structures.add(new Block(bufferedLine));
+									}
+									else if(lineAnalysis(bufferedLine.get(0)) == 4){
+										mdFiles.get(i).structures.add(new QuotedBlock(bufferedLine));
+									}
+									else if(lineAnalysis(bufferedLine.get(0)) == 5){
+										mdFiles.get(i).structures.add(new ItemList(bufferedLine));
+									}
+									else{
+										mdFiles.get(i).structures.add(new Block(bufferedLine));
+									}
+								}
+								this.clearBuffer(bufferedLine);
+								this.toBuffer(bufferedLine, line);
+							}
+							else 
+								this.toBuffer(bufferedLine, line);
+							break;
+						}
+						case 5: { // itemlist
+							this.toBuffer(bufferedLine, line);
+							break;
+						}
+						case 6: {
+							break;
+						}
+						case 7: {
+							break;
+						}
+						case 8: {
+							this.toBuffer(bufferedLine, line);
+							mdFiles.get(i).structures.add(new Horizontal(bufferedLine));
+							this.clearBuffer(bufferedLine);
+							break;
+						}
+						case 9: {
+							this.toBuffer(bufferedLine, line);
+							mdFiles.get(i).structures.add(new LinkReference(bufferedLine));
+							this.clearBuffer(bufferedLine);
+							break;
 						}
 					}
-					case 4:
-					case 5: {
-							this.toBuffer(bufferedLine, line);
+					prevState = curState;
+				}
+
+				if(bufferedLine.size() != 0){
+					if(lineAnalysis(bufferedLine.get(0)) == 1){
+						mdFiles.get(i).structures.add(new Block(bufferedLine));
+					}
+					else if(lineAnalysis(bufferedLine.get(0)) == 4){
+						mdFiles.get(i).structures.add(new QuotedBlock(bufferedLine));
+					}
+					else if(lineAnalysis(bufferedLine.get(0)) == 5){
+						mdFiles.get(i).structures.add(new ItemList(bufferedLine));
+					}
+					else{
+						mdFiles.get(i).structures.add(new Block(bufferedLine));
 					}
 				}
-				prevState = curState;
-            }
-         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      }
-   }
+				this.clearBuffer(bufferedLine);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
    
    public int lineAnalysis(String line){
       if(line.length() == 0){
@@ -106,8 +220,8 @@ class MDParser{
 					if(words[0].charAt(0) == '[' && 
 							words[0].charAt(words[0].length()-2) == ']' && 
 							words[0].charAt(words[0].length()-1) == ':' &&
-							words[2].charAt(0) == '(' &&
-							words[2].charAt(words[2].length()-1) == ')'){
+							(words[2].charAt(0) == '(' || words[2].charAt(0) == '"') &&
+							(words[2].charAt(words[2].length()-1) == ')' || words[2].charAt(words[2].length()-1) == '"')){
 						return 9;
 					}
 				}
@@ -154,7 +268,7 @@ class MDParser{
    public ArrayList<String> getBuffer(ArrayList<String> theBuffer) {
 	   if(!theBuffer.isEmpty()) {
 		   for(int i = 0; i < theBuffer.size(); i++) {
-               System.out.println("one index " + i + " : value " + theBuffer.get(i));
+            //    System.out.println("one index " + i + " : value " + theBuffer.get(i));
            }
 	   }
 	   return theBuffer;
@@ -166,52 +280,83 @@ interface MDElement{
 }
 
 class Document implements MDElement{
-	
+	public ArrayList<Structure> structures;
+	public Document(){
+		structures = new ArrayList<Structure>();
+	}
 }
 
 class Structure implements MDElement{
-	private String parsedLine;
-	public static Structure create(String parsedLine){
-		Structure newStructure = new Structure();
-		newStructure.setParsedLine(parsedLine);
-		return newStructure;
+	public ArrayList<String> lines;
+	public Structure(ArrayList<String> lines){
+		// System.out.println("???");
+		this.lines = (ArrayList<String>)lines.clone();
+		// for(int j=0; j<this.lines.size(); j++){
+		// 	System.out.println(this.lines.get(j));
+		// }
+		// System.out.println();
 	}
-	public void setParsedLine(String parsedLine){
-		this.parsedLine = parsedLine;
-	}
+	// public static Structure create(ArrayList<String> lines){
+	// 	Structure newStructure = new Structure();
+	// 	newStructure.setlines(lines);
+	// 	return newStructure;
+	// }
+	// public void setlines(ArrayList<String> lines){
+	// 	this.lines = lines;
+	// }
 }
 
 class Header extends Structure{
-	private int headerNum;
 
-	public int getHeaderNum() {
-		return headerNum;
+	public Header(ArrayList<String> lines) {
+		super(lines);
+		// TODO Auto-generated constructor stub
 	}
 
-	public void setHeaderNum(int headerNum) {
-		this.headerNum = headerNum;
-	}
 }
 class Block extends Structure{
+
+	public Block(ArrayList<String> lines) {
+		super(lines);
+		// TODO Auto-generated constructor stub
+	}
 	
 }
 class QuotedBlock extends Structure{
+
+	public QuotedBlock(ArrayList<String> lines) {
+		super(lines);
+		// TODO Auto-generated constructor stub
+	}
 	
 }
-class CodeBlock extends Structure{
+// class CodeBlock extends Structure{
 	
-}
+// }
 class ItemList extends Structure{
-	private int type;
 
-	public int getType() {
-		return type;
+	public ItemList(ArrayList<String> lines) {
+		super(lines);
+		// TODO Auto-generated constructor stub
 	}
 
-	public void setType(int type) {
-		this.type = type;
+}
+class Horizontal extends Structure{
+
+	public Horizontal(ArrayList<String> lines) {
+		super(lines);
+		// TODO Auto-generated constructor stub
 	}
-} 
+	
+}
+class LinkReference extends Structure{
+
+	public LinkReference(ArrayList<String> lines) {
+		super(lines);
+		// TODO Auto-generated constructor stub
+	}
+	
+}
 
 class Text implements MDElement{
 	
@@ -250,7 +395,6 @@ class CommandInterpreter {
 			if (sp[sp.length-1].equals("md")) {
 				addMdFile(c1);
 			} else {
-				System.out.println("???");
 				printIllegalMessage();
 			}
 		} else if (c1.equals("--plain")) {

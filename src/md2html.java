@@ -1,7 +1,10 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class md2html {
@@ -17,37 +20,49 @@ public class md2html {
 		}
 		option = ci.getOption();
 		MDParser mp = new MDParser(inputStreams);
+		PlainVisitor v = new PlainVisitor();
+		
+		int i;
 
+		System.out.println("visitDocument_size = "+mp.mdFiles.size());
+		for(i=0; i<mp.mdFiles.size(); i++) {
+			v.visitDocument(mp.mdFiles.get(i));
+			
+			//for test
+			System.out.println("visitDocument("+i+")");
+		}
+		
+		
 		// mp.mdFiles.get(0).structures.get(0).lines.size();
 
 		// printing part.
-		for(int i=0; i<mp.mdFiles.size(); i++){
-			System.out.println(mp.mdFiles.get(i).structures.size());
-			for(int j=0; j<mp.mdFiles.get(i).structures.size(); j++){
-				if(mp.mdFiles.get(i).structures.get(j) instanceof Block){
-					System.out.println("Block");
-				}
-				else if(mp.mdFiles.get(i).structures.get(j) instanceof Header){
-					System.out.println("Header");
-				}
-				else if(mp.mdFiles.get(i).structures.get(j) instanceof QuotedBlock){
-					System.out.println("QuotedBlock");
-				}
-				else if(mp.mdFiles.get(i).structures.get(j) instanceof ItemList){
-					System.out.println("ItemList");
-				}
-				else if(mp.mdFiles.get(i).structures.get(j) instanceof Horizontal ){
-					System.out.println("Horizontal");
-				}
-				else if(mp.mdFiles.get(i).structures.get(j) instanceof LinkReference){
-					System.out.println("LinkReference");
-				}
-				for(int k=0; k<mp.mdFiles.get(i).structures.get(j).lines.size(); k++){
-					System.out.println(mp.mdFiles.get(i).structures.get(j).lines.get(k));
-				}
-				System.out.println();
-			}
-		}
+//		for(int i=0; i<mp.mdFiles.size(); i++){
+//			System.out.println(mp.mdFiles.get(i).structures.size());
+//			for(int j=0; j<mp.mdFiles.get(i).structures.size(); j++){
+//				if(mp.mdFiles.get(i).structures.get(j) instanceof Block){
+//					System.out.println("Block");
+//				}
+//				else if(mp.mdFiles.get(i).structures.get(j) instanceof Header){
+//					System.out.println("Header");
+//				}
+//				else if(mp.mdFiles.get(i).structures.get(j) instanceof QuotedBlock){
+//					System.out.println("QuotedBlock");
+//				}
+//				else if(mp.mdFiles.get(i).structures.get(j) instanceof ItemList){
+//					System.out.println("ItemList");
+//				}
+//				else if(mp.mdFiles.get(i).structures.get(j) instanceof Horizontal ){
+//					System.out.println("Horizontal");
+//				}
+//				else if(mp.mdFiles.get(i).structures.get(j) instanceof LinkReference){
+//					System.out.println("LinkReference");
+//				}
+//				for(int k=0; k<mp.mdFiles.get(i).structures.get(j).lines.size(); k++){
+//					System.out.println(mp.mdFiles.get(i).structures.get(j).lines.get(k));
+//				}
+//				System.out.println();
+//			}
+//		}
 	}
 }
 
@@ -101,6 +116,7 @@ class MDParser{
 						}
 						case 3:{
 							if(prevState==1) {
+								this.toBuffer(bufferedLine, line);
 								mdFiles.get(i).structures.add(new Header(bufferedLine));
 								this.clearBuffer(bufferedLine);
 							}
@@ -270,6 +286,115 @@ class Structure implements MDElement{
 		this.lines = (ArrayList<String>)lines.clone();
 	}
 }
+
+interface MDElementVisitor{
+	void visitDocument(Document d);
+	void visitStructure(Structure s);
+	void visitStructure(Header s);
+	void visitStructure(Block s);
+	void visitStructure(QuotedBlock s);
+	void visitStructure(ItemList s);
+	void visitStructure(Horizontal s);
+	void visitStructure(LinkReference s);
+}
+class PlainVisitor implements MDElementVisitor {
+	public void visitDocument(Document d){
+		
+      // d 에서 
+      System.out.println("struct size === "+d.structures.size());
+		
+      int i;
+      for(i=0; i < d.structures.size() ;i++) {
+
+          //for test
+          System.out.println("visitStruct("+i+")");
+    	  
+          visitStructure( d.structures.get(i) );
+          
+
+      }
+	}         
+
+
+	public void visitStructure(Structure s) {
+        System.out.println("overload");
+		if(s instanceof Header) {			visitStructure((Header)s);		}
+		else if (s instanceof Block) {			visitStructure((Block)s); 		}
+		else if (s instanceof QuotedBlock) {			visitStructure((QuotedBlock)s);		}
+		else if (s instanceof ItemList) {			visitStructure((ItemList)s);		}
+		else if (s instanceof Horizontal) {		visitStructure((Horizontal)s);	}
+		else if (s instanceof LinkReference) {		visitStructure((LinkReference)s);	}
+		else {	System.out.println("error");		}
+	}
+
+	
+	public void visitStructure(Header s) {
+		
+		
+		//단어 별하나 이텔릭, 별두개 볼드, image링크
+		//를 각각 단어마다 구현해야
+
+		
+		
+		//for test
+		System.out.println("		visitStructure(Header)");
+		
+		for(int k=0; k<s.lines.size(); k++){
+			System.out.println("===>> "+s.lines.get(k));
+		}
+		System.out.println();
+	}
+	public void visitStructure(Block s) {
+		//for test
+		System.out.println("		visitStructure(Block)");
+		
+		for(int k=0; k<s.lines.size(); k++){
+			System.out.println("===>> "+s.lines.get(k));
+		}
+		System.out.println();
+	}
+	public void visitStructure(QuotedBlock s) {
+		//for test
+		System.out.println("		visitStructure(QuotedBlock)");
+		
+		for(int k=0; k<s.lines.size(); k++){
+			System.out.println("===>> "+s.lines.get(k));
+		}
+		System.out.println();
+	}
+	public void visitStructure(ItemList s) {
+		//for test
+		System.out.println("		visitStructure(ItemList)");
+		
+		for(int k=0; k<s.lines.size(); k++){
+			System.out.println("===>> "+s.lines.get(k));
+		}
+		System.out.println();
+	}
+	public void visitStructure(Horizontal s) {
+
+		//for test
+		System.out.println("		visitStructure(Horizontal)");
+		
+		for(int k=0; k<s.lines.size(); k++){
+			System.out.println("===>> "+s.lines.get(k));
+		}
+		System.out.println();
+		
+	}
+	public void visitStructure(LinkReference s) {
+
+		//for test
+		System.out.println("		visitStructure(LinkReference)");
+		
+		for(int k=0; k<s.lines.size(); k++){
+			System.out.println("===>> "+s.lines.get(k));
+		}
+		System.out.println();
+	}
+
+}
+
 
 class Header extends Structure{
 	public Header(ArrayList<String> lines) {

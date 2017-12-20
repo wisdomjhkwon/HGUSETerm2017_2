@@ -22,22 +22,50 @@ public class md2html {
 
 class MDParser{
 	public ArrayList<String> bufferedLine;
-   public MDParser(FileReader[] inputs){
-	   bufferedLine = new ArrayList<String>();
+	private ArrayList<Document> mdFiles;
+	public MDParser(FileReader[] inputs){
+		bufferedLine = new ArrayList<String>();
+		mdFiles = new ArrayList<Document>();
+		int curState = -1;
+		int prevState = -1;
 	   
-      for(int i=0; i<inputs.length; i++){
-         BufferedReader in = new BufferedReader(inputs[i]);
-         String line;
-		 int curState;
-		 int prevState;
+	for(int i=0; i<inputs.length; i++){
+		BufferedReader in = new BufferedReader(inputs[i]);
+		String line;
 		 
-         try {
-            while ((line = in.readLine()) != null) {
+        try {  
+			while ((line = in.readLine()) != null) {
 				curState = lineAnalysis(line);
-				System.out.println(line + " " + curState);
-			   
+				System.out.println(line);
+			    //this.toBuffer(bufferedLine, line);
+				
+				switch(curState) {
+					case 0: {
 
-
+					}
+					case 1: {
+						this.toBuffer(bufferedLine, line);
+					}
+					case 2: {
+						System.out.println("Header");
+						// create the text of header
+						
+					}
+					case 3:{
+						if(prevState==1) {
+							System.out.println("header");
+							this.getBuffer(bufferedLine);
+							this.clearBuffer(bufferedLine);
+						}
+						else {
+							System.out.println("Horizontal line");
+						}
+					}
+					case 4:
+					case 5: {
+							this.toBuffer(bufferedLine, line);
+					}
+				}
 				prevState = curState;
             }
          } catch (IOException e) {

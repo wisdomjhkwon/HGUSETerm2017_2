@@ -20,6 +20,7 @@ public class md2html {
 
 		// mp.mdFiles.get(0).structures.get(0).lines.size();
 
+		// printing part.
 		for(int i=0; i<mp.mdFiles.size(); i++){
 			System.out.println(mp.mdFiles.get(i).structures.size());
 			for(int j=0; j<mp.mdFiles.get(i).structures.size(); j++){
@@ -96,25 +97,13 @@ class MDParser{
 							this.toBuffer(bufferedLine, line);
 							mdFiles.get(i).structures.add(new Header(bufferedLine));
 							this.clearBuffer(bufferedLine);
-							// System.out.println("============CASE 2 HEADER =======");
-							//create the text of header
 							break;
 						}
 						case 3:{
 							if(prevState==1) {
-								// System.out.println("~~~~CASE 3 HEADER~~~~~s");
 								mdFiles.get(i).structures.add(new Header(bufferedLine));
 								this.clearBuffer(bufferedLine);
 							}
-							// else {
-							// 	flag = prevState;
-								
-							// 	if(!bufferedLine.isEmpty()) {
-							// 		this.getBuffer(bufferedLine);
-							// 	}
-								
-							// 	System.out.println("============CASE3 HorizontalLine =======");
-							// }
 							break;
 						}
 						case 4: { // > quoted block
@@ -193,16 +182,9 @@ class MDParser{
       if(line.length() == 0){
          return 0;
       }
-    //   else if(line.charAt(0)==' ' && line.charAt(1)==' ' && line.charAt(2)==' ' && line.charAt(3)==' '){
-    //      if(line.charAt(4)==' ' && line.charAt(5)==' ' && line.charAt(6)==' ' && line.charAt(7)==' '){
-    //         return 7; // double indented
-    //      }
-    //      return 6; // indented
-    //   }
       else{
 		int i=0;
 		String[] words = line.split("\\s");
-		// System.out.println(words.length);
 		if(words.length == 1){
 			int j=0;
 			for(i=0; i<words[0].length(); i++){
@@ -239,7 +221,6 @@ class MDParser{
 				}
 			}
 			if(i == words[0].length() && i != 0){
-				// System.out.println(words[0]);
 				return 2;
 			}
 			if(words[0].length() !=0 && words[0].charAt(0) == '>'){
@@ -248,7 +229,6 @@ class MDParser{
 			int k=0;
 			while(words[k].length() == 0)
 				k++;
-			// System.out.println(words[k]);
 			if(words[k].equals("*") || words[k].equals("+") || words[k].equals("-")){
 				return 5;				
 			}
@@ -268,7 +248,6 @@ class MDParser{
    public ArrayList<String> getBuffer(ArrayList<String> theBuffer) {
 	   if(!theBuffer.isEmpty()) {
 		   for(int i = 0; i < theBuffer.size(); i++) {
-            //    System.out.println("one index " + i + " : value " + theBuffer.get(i));
            }
 	   }
 	   return theBuffer;
@@ -276,7 +255,6 @@ class MDParser{
 }
 
 interface MDElement{
-//	public void accept();
 }
 
 class Document implements MDElement{
@@ -289,87 +267,40 @@ class Document implements MDElement{
 class Structure implements MDElement{
 	public ArrayList<String> lines;
 	public Structure(ArrayList<String> lines){
-		// System.out.println("???");
 		this.lines = (ArrayList<String>)lines.clone();
-		// for(int j=0; j<this.lines.size(); j++){
-		// 	System.out.println(this.lines.get(j));
-		// }
-		// System.out.println();
 	}
-	// public static Structure create(ArrayList<String> lines){
-	// 	Structure newStructure = new Structure();
-	// 	newStructure.setlines(lines);
-	// 	return newStructure;
-	// }
-	// public void setlines(ArrayList<String> lines){
-	// 	this.lines = lines;
-	// }
 }
 
 class Header extends Structure{
-
 	public Header(ArrayList<String> lines) {
 		super(lines);
-		// TODO Auto-generated constructor stub
 	}
-
 }
 class Block extends Structure{
-
 	public Block(ArrayList<String> lines) {
 		super(lines);
-		// TODO Auto-generated constructor stub
 	}
-	
 }
 class QuotedBlock extends Structure{
-
 	public QuotedBlock(ArrayList<String> lines) {
 		super(lines);
-		// TODO Auto-generated constructor stub
 	}
-	
 }
-// class CodeBlock extends Structure{
-	
-// }
-class ItemList extends Structure{
 
+class ItemList extends Structure{
 	public ItemList(ArrayList<String> lines) {
 		super(lines);
-		// TODO Auto-generated constructor stub
 	}
-
 }
 class Horizontal extends Structure{
-
 	public Horizontal(ArrayList<String> lines) {
 		super(lines);
-		// TODO Auto-generated constructor stub
 	}
-	
 }
 class LinkReference extends Structure{
-
 	public LinkReference(ArrayList<String> lines) {
 		super(lines);
-		// TODO Auto-generated constructor stub
 	}
-	
-}
-
-class Text implements MDElement{
-	
-}
-
-class PlainText extends Text{
-	
-}
-class SytleText extends Text{
-	
-}
-class HTMLCode extends Text{
-	
 }
 
 class CommandInterpreter {

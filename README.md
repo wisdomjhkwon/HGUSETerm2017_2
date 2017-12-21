@@ -12,7 +12,7 @@ Build
     
 # 2. Run
 
-    java md2html [MDfiles] -o [HTMLfiles] [--mode]
+    java -cp classes md2html [MDfiles] -o [HTMLfiles] [--mode]
 
 * "--plain"(default)      plain design
 * "--stylish"             stylish design

@@ -30,3 +30,9 @@
 /LinkReference.class
 /MDElementVisitor.class
 /PlainVisitor.class
+/md2htmlTest.class
+/CommandInterpreterTest.class
+/MDParserTest.class
+/test.class
+/Test.class
+/StyleVisitor.class

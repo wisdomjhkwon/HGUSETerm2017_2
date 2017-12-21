@@ -4,7 +4,7 @@
 
 Clone the repository
 
-    git clone https://github.com/wisdomjhkwon/HGUSETerm2017_2.git md2html
+    git clone https://github.com/wisdomjhkwon/HGUSETerm2017_2.git md2html
     
 Build
 

@@ -12,5 +12,5 @@ Build
     
 # 2. Run
 
-    java bin/md2html [MDfiles] -o [HTMLfiles] [--mode]
+    java md2html [MDfiles] -o [HTMLfiles] [--mode]
     

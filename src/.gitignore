@@ -28,3 +28,5 @@
 /MDParser$Text.class
 /Horizontal.class
 /LinkReference.class
+/MDElementVisitor.class
+/PlainVisitor.class

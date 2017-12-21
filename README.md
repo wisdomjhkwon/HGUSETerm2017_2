@@ -1,6 +1,6 @@
 # md2html
 
-# 1.build
+# 1. Build
 
 Clone the repository
 
@@ -9,4 +9,8 @@ Clone the repository
 Build
 
     ant
+    
+# 2. Run
+
+    java bin/md2html [MDfiles] -o [HTMLfiles] [--mode]
     

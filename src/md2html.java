@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public class md2html {
 	private static FileReader[] inputStreams;
 	private static ArrayList<String> htmlFiles;
+	private static MDParser mp;
 	private static int option;
 	public static void main(String[] args) {
 		CommandInterpreter ci = new CommandInterpreter(args);
@@ -19,7 +20,7 @@ public class md2html {
 			System.out.println(htmlFiles.get(i));
 		}
 		option = ci.getOption();
-		MDParser mp = new MDParser(inputStreams);
+		mp = new MDParser(inputStreams);
 		PlainVisitor v = new PlainVisitor();
 		
 		int i;
@@ -35,34 +36,36 @@ public class md2html {
 		
 		// mp.mdFiles.get(0).structures.get(0).lines.size();
 
-		// printing part.
-//		for(int i=0; i<mp.mdFiles.size(); i++){
-//			System.out.println(mp.mdFiles.get(i).structures.size());
-//			for(int j=0; j<mp.mdFiles.get(i).structures.size(); j++){
-//				if(mp.mdFiles.get(i).structures.get(j) instanceof Block){
-//					System.out.println("Block");
-//				}
-//				else if(mp.mdFiles.get(i).structures.get(j) instanceof Header){
-//					System.out.println("Header");
-//				}
-//				else if(mp.mdFiles.get(i).structures.get(j) instanceof QuotedBlock){
-//					System.out.println("QuotedBlock");
-//				}
-//				else if(mp.mdFiles.get(i).structures.get(j) instanceof ItemList){
-//					System.out.println("ItemList");
-//				}
-//				else if(mp.mdFiles.get(i).structures.get(j) instanceof Horizontal ){
-//					System.out.println("Horizontal");
-//				}
-//				else if(mp.mdFiles.get(i).structures.get(j) instanceof LinkReference){
-//					System.out.println("LinkReference");
-//				}
-//				for(int k=0; k<mp.mdFiles.get(i).structures.get(j).lines.size(); k++){
-//					System.out.println(mp.mdFiles.get(i).structures.get(j).lines.get(k));
-//				}
-//				System.out.println();
-//			}
-//		}
+	}
+
+void print(){
+		for(int i=0; i<mp.mdFiles.size(); i++){
+			System.out.println(mp.mdFiles.get(i).structures.size());
+			for(int j=0; j<mp.mdFiles.get(i).structures.size(); j++){
+				if(mp.mdFiles.get(i).structures.get(j) instanceof Block){
+					System.out.println("Block");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof Header){
+					System.out.println("Header");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof QuotedBlock){
+					System.out.println("QuotedBlock");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof ItemList){
+					System.out.println("ItemList");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof Horizontal ){
+					System.out.println("Horizontal");
+				}
+				else if(mp.mdFiles.get(i).structures.get(j) instanceof LinkReference){
+					System.out.println("LinkReference");
+				}
+				for(int k=0; k<mp.mdFiles.get(i).structures.get(j).lines.size(); k++){
+					System.out.println(mp.mdFiles.get(i).structures.get(j).lines.get(k));
+				}
+				System.out.println();
+			}
+		}
 	}
 }
 
@@ -300,7 +303,7 @@ interface MDElementVisitor{
 class PlainVisitor implements MDElementVisitor {
 	public void visitDocument(Document d){
 		
-      // d 에서 
+      // d ���� 
       System.out.println("struct size === "+d.structures.size());
 		
       int i;
@@ -331,8 +334,8 @@ class PlainVisitor implements MDElementVisitor {
 	public void visitStructure(Header s) {
 		
 		
-		//단어 별하나 이텔릭, 별두개 볼드, image링크
-		//를 각각 단어마다 구현해야
+		//�ܾ� ���ϳ� ���ڸ�, ���ΰ� ����, image��ũ
+		//�� ���� �ܾ�� �����ؾ�
 
 		
 		
@@ -596,8 +599,12 @@ class CommandInterpreter {
 				printNoFile();
 			}
 		}
-		
-//		if(html_files)
+		if(html_files.size() == 0){
+			for(int i=0; i<md_files.size(); i++){
+			   String fileName = md_files.get(i).substring(md_files.get(i).lastIndexOf('/') + 1);
+			   html_files.add(fileName.substring(0, fileName.lastIndexOf('.')) + ".html");
+			}
+		 }
 	}
 
 	public String getFormat(String file) {
